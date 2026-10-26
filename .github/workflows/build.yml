@@ -31,6 +31,8 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk NoCutout17-Xposed-v${{ github.run_number }}.apk
           sed -i "s/^version=.*/version=v${{ github.run_number }}/; s/^versionCode=.*/versionCode=${{ github.run_number }}/" magisk/module.prop
           (cd magisk && zip -r9 ../NoCutout17-Magisk-v${{ github.run_number }}.zip .)
+          sed -i "s/^version=.*/version=v${{ github.run_number }}/; s/^versionCode=.*/versionCode=${{ github.run_number }}/" magisk-roundicons/module.prop
+          (cd magisk-roundicons && zip -r9 ../RoundIcons17-Magisk-v${{ github.run_number }}.zip .)
 
       - uses: actions/upload-artifact@v4
         with:
@@ -46,4 +48,5 @@ jobs:
           name: No Cutout 17 build ${{ github.run_number }}
           files: |
             NoCutout17-Magisk-v${{ github.run_number }}.zip
+            RoundIcons17-Magisk-v${{ github.run_number }}.zip
             NoCutout17-Xposed-v${{ github.run_number }}.apk

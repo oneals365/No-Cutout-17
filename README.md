@@ -28,3 +28,6 @@ To turn it off from a terminal: `su -c 'cmd overlay disable --user 0 com.android
 `Hook.java` hooks `Window.setAttributes`, `WindowManagerGlobal.addView` and `WindowManagerGlobal.updateViewLayout` inside each scoped app and sets `layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS`.
 
 The signing key in `keystore/` is committed on purpose so every build has the same signature and installs over the last one. It's a personal module key, not used for anything else.
+
+## Bonus: Round Icons 17 (Magisk / Alpha module)
+`RoundIcons17-Magisk-vX.zip` in Releases sets Android's icon shape (`config_icon_mask`) to a circle with the same fabricated-overlay method, so adaptive icons are round system-wide. Install, reboot, and use its **Action** button to toggle. One UI Home may still draw its own shape on the home screen; Good Lock → Theme Park can cover that.
