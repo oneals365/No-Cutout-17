@@ -9,6 +9,8 @@ Samsung's built-in *Settings → Display → Camera cutout* option is easy to lo
 2. Reboot.
 3. Settings → Developer options → **Simulate display with cutout → No cutout**.
 
+Samsung only loads overlays whose package name is on its built-in allowed list, so this module takes the place of the stock *Waterfall cutout* option (same package name) instead of adding a new one. Removing the module brings Waterfall back.
+
 The whole system then treats the screen as having no camera hole, so every app goes full screen. To undo, pick **Default** again (or remove the module).
 
 ## Option 2: Xposed module (per-app)

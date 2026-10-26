@@ -4,14 +4,14 @@ plugins { id 'com.android.application' }
 // entry to Developer options > Simulate display with cutout; choosing it makes
 // the system report no display cutout, so every app lays out full screen.
 android {
-    namespace 'com.android.internal.display.cutout.emulation.nocutout17'
+    namespace 'com.android.internal.display.cutout.emulation.waterfall'
     compileSdk 36
 
     defaultConfig {
-        applicationId 'com.android.internal.display.cutout.emulation.nocutout17'
+        applicationId 'com.android.internal.display.cutout.emulation.waterfall'
         minSdk 30
         targetSdk 36
-        versionCode 1
+        versionCode 1700
         versionName '1.0'
     }
 

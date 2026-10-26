@@ -29,8 +29,9 @@ jobs:
       - name: Package APK and Magisk module
         run: |
           cp app/build/outputs/apk/release/app-release.apk NoCutout17-Xposed-v${{ github.run_number }}.apk
-          mkdir -p magisk/system/product/overlay/NoCutout17
-          cp overlay/build/outputs/apk/release/overlay-release.apk magisk/system/product/overlay/NoCutout17/NoCutout17.apk
+          mkdir -p magisk/system/product/overlay/DisplayCutoutEmulationWaterfall
+          touch magisk/system/product/overlay/DisplayCutoutEmulationWaterfall/.replace
+          cp overlay/build/outputs/apk/release/overlay-release.apk magisk/system/product/overlay/DisplayCutoutEmulationWaterfall/DisplayCutoutEmulationWaterfall.apk
           sed -i "s/^version=.*/version=v${{ github.run_number }}/; s/^versionCode=.*/versionCode=${{ github.run_number }}/" magisk/module.prop
           (cd magisk && zip -r9 ../NoCutout17-Magisk-v${{ github.run_number }}.zip .)
 
