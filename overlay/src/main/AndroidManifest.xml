@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <overlay
-        android:targetPackage="android"
-        android:category="com.android.internal.display_cutout_emulation"
-        android:priority="1" />
-    <application android:label="@string/overlay_label" android:hasCode="false" />
-</manifest>

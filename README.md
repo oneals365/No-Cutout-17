@@ -4,14 +4,13 @@ A Vector / LSPosed module that forces apps to draw **full screen around the came
 
 Samsung's built-in *Settings → Display → Camera cutout* option is easy to lose: apps that set their own cutout mode override it, and the choice can reset when an app updates. This module rewrites each app window's cutout mode to **Always** every time a window is created or updated, so it sticks.
 
-## Option 1 (recommended): Magisk / Alpha module — works like No Cutout Display
-1. Download `NoCutout17-Magisk-vX.zip` from **Releases** and install it in Magisk/Alpha → Modules → Install from storage.
-2. Reboot.
-3. Settings → Developer options → **Simulate display with cutout → No cutout**.
+## Option 1 (recommended): Magisk / Alpha module — system-wide, like No Cutout Display
+1. Download `NoCutout17-Magisk-vX.zip` from **Releases** and install it in Magisk/Alpha → Modules → Install from storage. It turns on straight away.
+2. To switch it on/off, tap the **Action** button on No Cutout 17 in the Modules list. Your choice is remembered across reboots.
 
-Samsung only loads overlays whose package name is on its built-in allowed list, so this module takes the place of the stock *Waterfall cutout* option (same package name) instead of adding a new one. Removing the module brings Waterfall back.
+How it works: the module asks Android to build a "fabricated" overlay (`com.android.shell:NoCutout17`) that sets `config_mainBuiltInDisplayCutout` to empty, so the system treats the screen as having no camera hole and every app goes full screen. A regular overlay APK can't be used because Samsung's Android 17 only loads preinstalled overlays from its own allowlist. Because of this it doesn't appear under Developer options → Simulate display with cutout; use the Action button instead.
 
-The whole system then treats the screen as having no camera hole, so every app goes full screen. To undo, pick **Default** again (or remove the module).
+To turn it off from a terminal: `su -c 'cmd overlay disable --user 0 com.android.shell:NoCutout17 </dev/null >/dev/null 2>&1'`
 
 ## Option 2: Xposed module (per-app)
 1. Download the latest APK from **Releases** (built automatically by GitHub Actions).
