@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">No Cutout 17</string>
+    <string name="xposed_description">Forces apps to draw full screen around the camera cutout, in portrait and landscape. Works on Android 15–17 with Vector/LSPosed. Tick the apps you want in scope.</string>
+</resources>
