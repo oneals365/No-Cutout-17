@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Round Icons 17</string>
+    <string name="xposed_description">Experimental: draws adaptive app icons as circles in the apps you tick (System UI, One UI Home, Settings…). Force stop or reboot after changing scope.</string>
+    <string-array name="xposed_scope">
+        <item>com.android.systemui</item>
+        <item>com.sec.android.app.launcher</item>
+        <item>com.android.settings</item>
+    </string-array>
+</resources>
