@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Empty cutout path = the system treats the screen as having no cutout. -->
+    <string name="config_mainBuiltInDisplayCutout" translatable="false"></string>
+    <string name="config_mainBuiltInDisplayCutoutRectApproximation" translatable="false"></string>
+    <bool name="config_fillMainBuiltInDisplayCutout">false</bool>
+    <string name="overlay_label" translatable="false">No cutout</string>
+</resources>

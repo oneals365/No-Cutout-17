@@ -24,19 +24,28 @@ jobs:
           gradle-version: '8.14.3'
 
       - name: Build release APK
-        run: gradle :app:assembleRelease --no-daemon --stacktrace
+        run: gradle :app:assembleRelease :overlay:assembleRelease --no-daemon --stacktrace
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk NoCutout17-v${{ github.run_number }}.apk
+      - name: Package APK and Magisk module
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk NoCutout17-Xposed-v${{ github.run_number }}.apk
+          mkdir -p magisk/system/product/overlay
+          cp overlay/build/outputs/apk/release/overlay-release.apk magisk/system/product/overlay/NoCutout17Overlay.apk
+          sed -i "s/^version=.*/version=v${{ github.run_number }}/; s/^versionCode=.*/versionCode=${{ github.run_number }}/" magisk/module.prop
+          (cd magisk && zip -r9 ../NoCutout17-Magisk-v${{ github.run_number }}.zip .)
 
       - uses: actions/upload-artifact@v4
         with:
           name: NoCutout17-apk
-          path: NoCutout17-v${{ github.run_number }}.apk
+          path: |
+            NoCutout17-Xposed-v${{ github.run_number }}.apk
+            NoCutout17-Magisk-v${{ github.run_number }}.zip
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: No Cutout 17 build ${{ github.run_number }}
-          files: NoCutout17-v${{ github.run_number }}.apk
+          files: |
+            NoCutout17-Magisk-v${{ github.run_number }}.zip
+            NoCutout17-Xposed-v${{ github.run_number }}.apk

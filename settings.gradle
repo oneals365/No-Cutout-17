@@ -5,4 +5,4 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 rootProject.name = "No-Cutout-17"
-include ':app', ':xposed-stubs'
+include ':app', ':xposed-stubs', ':overlay'

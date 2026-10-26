@@ -1,0 +1,6 @@
+id=nocutout17
+name=No Cutout 17
+version=v1
+versionCode=1
+author=oneals365
+description=Adds "No cutout" to Developer options > Simulate display with cutout. Select it to make every app full screen around the camera hole. Android 11-17.

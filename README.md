@@ -4,7 +4,14 @@ A Vector / LSPosed module that forces apps to draw **full screen around the came
 
 Samsung's built-in *Settings → Display → Camera cutout* option is easy to lose: apps that set their own cutout mode override it, and the choice can reset when an app updates. This module rewrites each app window's cutout mode to **Always** every time a window is created or updated, so it sticks.
 
-## Install
+## Option 1 (recommended): Magisk / Alpha module — works like No Cutout Display
+1. Download `NoCutout17-Magisk-vX.zip` from **Releases** and install it in Magisk/Alpha → Modules → Install from storage.
+2. Reboot.
+3. Settings → Developer options → **Simulate display with cutout → No cutout**.
+
+The whole system then treats the screen as having no camera hole, so every app goes full screen. To undo, pick **Default** again (or remove the module).
+
+## Option 2: Xposed module (per-app)
 1. Download the latest APK from **Releases** (built automatically by GitHub Actions).
 2. Install it, open **Vector → Modules → No Cutout 17**, and enable it.
 3. Tick the apps you want full screen. No System Framework scope is needed.
