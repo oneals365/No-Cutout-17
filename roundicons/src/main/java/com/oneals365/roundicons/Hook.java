@@ -92,22 +92,36 @@ public class Hook implements IXposedHookLoadPackage {
         }
     }
 
-    /** Wrap squircle icon backgrounds (notification small-icon circles, etc.) in a circular clip. */
+    /** First argument that looks like a resource id (package byte set), else 0. */
+    private static int resId(Object[] args) {
+        if (args == null) return 0;
+        for (Object a : args) {
+            if (a instanceof Integer && (((Integer) a) >>> 24) != 0) return (Integer) a;
+        }
+        return 0;
+    }
+
+    private static final XC_MethodHook WRAP_SQUIRCLE = new XC_MethodHook() {
+        @Override
+        protected void afterHookedMethod(MethodHookParam param) {
+            Object result = param.getResult();
+            if (!(result instanceof Drawable) || result instanceof CircleClipDrawable) return;
+            int id = resId(param.args);
+            if (id != 0 && isSquircleIcon((Resources) param.thisObject, id)) {
+                param.setResult(new CircleClipDrawable((Drawable) result));
+            }
+        }
+    };
+
+    /**
+     * Wrap squircle icon backgrounds (notification small-icon backgrounds etc.) in a circular clip.
+     * Resources.loadDrawable is the common path for code (getDrawable) and layouts/styles
+     * (TypedArray), so hooking it catches backgrounds set in XML too.
+     */
     private static void hookSquircleDrawables() {
-        try {
-            XposedBridge.hookAllMethods(Resources.class, "getDrawableForDensity", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) {
-                    Object result = param.getResult();
-                    if (!(result instanceof Drawable) || result instanceof CircleClipDrawable) return;
-                    if (param.args == null || param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
-                    if (isSquircleIcon((Resources) param.thisObject, (Integer) param.args[0])) {
-                        param.setResult(new CircleClipDrawable((Drawable) result));
-                    }
-                }
-            });
-        } catch (Throwable t) {
-            XposedBridge.log(TAG + "drawable hook failed: " + t);
+        for (String m : new String[]{"loadDrawable", "getDrawableForDensity"}) {
+            try { XposedBridge.hookAllMethods(Resources.class, m, WRAP_SQUIRCLE); }
+            catch (Throwable t) { XposedBridge.log(TAG + "drawable hook " + m + " failed: " + t); }
         }
     }
 
