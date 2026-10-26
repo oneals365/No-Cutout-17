@@ -2,9 +2,13 @@ package com.oneals365.roundicons;
 
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.content.res.Resources;
 import android.graphics.drawable.AdaptiveIconDrawable;
+import android.graphics.drawable.Drawable;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -70,6 +74,43 @@ public class Hook implements IXposedHookLoadPackage {
         catch (Throwable t) { XposedBridge.log(TAG + "no " + c.getSimpleName() + "." + method); }
     }
 
+    /** Resource id -> whether it's a squircle icon background (e.g. notification_icon_squircle). */
+    private static final Map<Integer, Boolean> SQUIRCLE_IDS = new HashMap<>();
+
+    private static boolean isSquircleIcon(Resources res, int id) {
+        if (id == 0) return false;
+        synchronized (SQUIRCLE_IDS) {
+            Boolean known = SQUIRCLE_IDS.get(id);
+            if (known != null) return known;
+            boolean yes = false;
+            try {
+                String name = res.getResourceEntryName(id).toLowerCase();
+                yes = name.contains("squircle") && name.contains("icon");
+            } catch (Throwable ignored) { }
+            SQUIRCLE_IDS.put(id, yes);
+            return yes;
+        }
+    }
+
+    /** Wrap squircle icon backgrounds (notification small-icon circles, etc.) in a circular clip. */
+    private static void hookSquircleDrawables() {
+        try {
+            XposedBridge.hookAllMethods(Resources.class, "getDrawableForDensity", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    Object result = param.getResult();
+                    if (!(result instanceof Drawable) || result instanceof CircleClipDrawable) return;
+                    if (param.args == null || param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
+                    if (isSquircleIcon((Resources) param.thisObject, (Integer) param.args[0])) {
+                        param.setResult(new CircleClipDrawable((Drawable) result));
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + "drawable hook failed: " + t);
+        }
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
         if (SELF.equals(lpparam.packageName)) {
@@ -94,6 +135,7 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         roundAll();
+        hookSquircleDrawables();
 
         // AOSP adaptive icons: masks are (re)built in the constructor and on bounds changes.
         try { XposedBridge.hookAllConstructors(AdaptiveIconDrawable.class, ROUND_FIRST); }
