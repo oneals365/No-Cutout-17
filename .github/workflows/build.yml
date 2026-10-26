@@ -24,12 +24,13 @@ jobs:
           gradle-version: '8.14.3'
 
       - name: Build release APK
-        run: gradle :app:assembleRelease :roundicons:assembleRelease --no-daemon --stacktrace
+        run: gradle :app:assembleRelease :roundicons:assembleRelease :hidestatusbar:assembleRelease --no-daemon --stacktrace
 
       - name: Package APK and Magisk module
         run: |
           cp app/build/outputs/apk/release/app-release.apk NoCutout17-Xposed-v${{ github.run_number }}.apk
           cp roundicons/build/outputs/apk/release/roundicons-release.apk RoundIcons17-Xposed-v${{ github.run_number }}.apk
+          cp hidestatusbar/build/outputs/apk/release/hidestatusbar-release.apk HideStatusBar17-Xposed-v${{ github.run_number }}.apk
           sed -i "s/^version=.*/version=v${{ github.run_number }}/; s/^versionCode=.*/versionCode=${{ github.run_number }}/" magisk/module.prop
           (cd magisk && zip -r9 ../NoCutout17-Magisk-v${{ github.run_number }}.zip .)
           sed -i "s/^version=.*/version=v${{ github.run_number }}/; s/^versionCode=.*/versionCode=${{ github.run_number }}/" magisk-roundicons/module.prop
@@ -41,6 +42,7 @@ jobs:
           path: |
             NoCutout17-Xposed-v${{ github.run_number }}.apk
             RoundIcons17-Xposed-v${{ github.run_number }}.apk
+            HideStatusBar17-Xposed-v${{ github.run_number }}.apk
             NoCutout17-Magisk-v${{ github.run_number }}.zip
 
       - name: Publish release
@@ -53,3 +55,4 @@ jobs:
             RoundIcons17-Magisk-v${{ github.run_number }}.zip
             NoCutout17-Xposed-v${{ github.run_number }}.apk
             RoundIcons17-Xposed-v${{ github.run_number }}.apk
+            HideStatusBar17-Xposed-v${{ github.run_number }}.apk

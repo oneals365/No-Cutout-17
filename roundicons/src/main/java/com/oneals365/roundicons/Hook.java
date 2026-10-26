@@ -4,7 +4,11 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.content.res.Resources;
 import android.graphics.drawable.AdaptiveIconDrawable;
+import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.view.ViewOutlineProvider;
+import android.widget.ImageView;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,7 +89,8 @@ public class Hook implements IXposedHookLoadPackage {
             boolean yes = false;
             try {
                 String name = res.getResourceEntryName(id).toLowerCase();
-                yes = name.contains("squircle") && name.contains("icon");
+                yes = name.contains("icon") && (name.contains("squircle")
+                        || (name.startsWith("noti") && (name.endsWith("_bg") || name.endsWith("icon_background"))));
             } catch (Throwable ignored) { }
             SQUIRCLE_IDS.put(id, yes);
             return yes;
@@ -125,6 +130,36 @@ public class Hook implements IXposedHookLoadPackage {
         }
     }
 
+    private static final ViewOutlineProvider OVAL = new ViewOutlineProvider() {
+        @Override
+        public void getOutline(View v, Outline o) { o.setOval(0, 0, v.getWidth(), v.getHeight()); }
+    };
+
+    /** System UI: notification small icons get their squircle background in NotificationIconManager. */
+    private static void hookNotificationIcons(ClassLoader cl) {
+        Class<?> mgr;
+        try { mgr = XposedHelpers.findClass("com.android.systemui.notification.NotificationIconManager", cl); }
+        catch (Throwable t) { return; }
+        XC_MethodHook clip = new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                if (param.args == null) return;
+                for (Object a : param.args) {
+                    if (a instanceof ImageView) {
+                        ImageView v = (ImageView) a;
+                        v.setOutlineProvider(OVAL);
+                        v.setClipToOutline(true);
+                        v.invalidateOutline();
+                    }
+                }
+            }
+        };
+        for (String m : new String[]{"updateIconColorAndBackground", "setNonGrayScaleIconBackground", "updateSmallIcon"}) {
+            try { XposedBridge.hookAllMethods(mgr, m, clip); }
+            catch (Throwable t) { XposedBridge.log(TAG + "no NotificationIconManager." + m); }
+        }
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
         if (SELF.equals(lpparam.packageName)) {
@@ -150,6 +185,7 @@ public class Hook implements IXposedHookLoadPackage {
 
         roundAll();
         hookSquircleDrawables();
+        if ("com.android.systemui".equals(lpparam.packageName)) hookNotificationIcons(lpparam.classLoader);
 
         // AOSP adaptive icons: masks are (re)built in the constructor and on bounds changes.
         try { XposedBridge.hookAllConstructors(AdaptiveIconDrawable.class, ROUND_FIRST); }

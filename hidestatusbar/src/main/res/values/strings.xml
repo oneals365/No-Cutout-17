@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Hide Status Bar 17</string>
+    <string name="xposed_description">Hides the status bar everywhere (apps, home, lock screen header, carrier name). Pull-down still works. Scope: System UI. Reboot after enabling.</string>
+    <string-array name="xposed_scope">
+        <item>com.android.systemui</item>
+    </string-array>
+</resources>

@@ -1,0 +1,42 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.oneals365.hidestatusbar'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.oneals365.hidestatusbar'
+        minSdk 30
+        targetSdk 36
+        versionCode 1
+        versionName '1.0'
+    }
+
+    signingConfigs {
+        release {
+            storeFile rootProject.file('keystore/release.jks')
+            storePassword 'nocutout17'
+            keyAlias 'nocutout'
+            keyPassword 'nocutout17'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+        debug { signingConfig signingConfigs.release }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint { abortOnError false; checkReleaseBuilds false }
+}
+
+dependencies {
+    compileOnly project(':xposed-stubs')
+}
