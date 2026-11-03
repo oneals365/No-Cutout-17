@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
         root.addView(text(
                 "What it does\n" +
                 "Hides the status bar everywhere: over apps, on the home screen, and the lock screen / shade " +
-                "header with the carrier name and battery. Pull-down still works.\n\n" +
+                "header with the carrier name and battery, plus the lock screen clock and lock icon. Pull-down and fingerprint unlock still work.\n\n" +
                 "Setup\n" +
                 "1. Vector \u2192 Modules \u2192 Hide Status Bar 17: turn it on (System UI is pre-ticked).\n" +
                 "2. Reboot.\n\n" +

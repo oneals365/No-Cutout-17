@@ -61,5 +61,50 @@ public class Hook implements IXposedHookLoadPackage {
                 catch (Throwable t) { XposedBridge.log(TAG + "no " + h[0] + "." + h[i]); }
             }
         }
+
+        hideLockScreenClockAndIcon(lpparam.classLoader, hide);
+    }
+
+    /**
+     * Lock screen clock: One UI draws it through the face widget plugin; SystemUI keeps
+     * its container in FaceWidgetContainerWrapper.mClockContainer and re-applies alpha and
+     * visibility through the methods hooked below, so we re-hide after each of them.
+     * Lock icon: SecLockIconView (Samsung) and DeviceEntryIconView (AOSP).
+     */
+    private static void hideLockScreenClockAndIcon(ClassLoader cl, XC_MethodHook hide) {
+        try {
+            Class<?> fw = XposedHelpers.findClass(
+                    "com.android.systemui.facewidget.plugin.FaceWidgetContainerWrapper", cl);
+            XC_MethodHook hideClock = new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        Object v = XposedHelpers.getObjectField(param.thisObject, "mClockContainer");
+                        if (v instanceof View) ((View) v).setTransitionAlpha(0f);
+                    } catch (Throwable ignored) { }
+                }
+            };
+            for (String m : new String[]{"initPlugin", "setAlpha", "setKeyguardStatusViewVisibility", "setDarkAmounts"}) {
+                try { XposedBridge.hookAllMethods(fw, m, hideClock); }
+                catch (Throwable t) { XposedBridge.log(TAG + "no FaceWidgetContainerWrapper." + m); }
+            }
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + "lock screen clock hook failed: " + t);
+        }
+
+        try {
+            Class<?> lock = XposedHelpers.findClass("com.android.keyguard.SecLockIconView", cl);
+            XposedBridge.hookAllMethods(lock, "onFinishInflate", hide);
+            XposedBridge.hookAllMethods(lock, "setVisibility", hide);
+            XposedBridge.hookAllMethods(lock, "updateLockIconViewLayoutParams", hide);
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + "SecLockIconView hook failed: " + t);
+        }
+        try {
+            Class<?> dev = XposedHelpers.findClass("com.android.systemui.keyguard.ui.view.DeviceEntryIconView", cl);
+            XposedBridge.hookAllConstructors(dev, hide);
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + "DeviceEntryIconView hook failed: " + t);
+        }
     }
 }
