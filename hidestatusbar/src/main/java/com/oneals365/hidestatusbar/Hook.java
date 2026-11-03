@@ -63,6 +63,27 @@ public class Hook implements IXposedHookLoadPackage {
         }
 
         hideLockScreenClockAndIcon(lpparam.classLoader, hide);
+        releaseStatusBarSpace(lpparam.classLoader);
+    }
+
+    /**
+     * EXPERIMENT: transparent views still reserve their height, which leaves an empty strip
+     * above apps. Setting the phone status bar view to GONE should release that space.
+     * May break pulling down the shade; if it does, this branch is discarded.
+     */
+    private static void releaseStatusBarSpace(ClassLoader cl) {
+        try {
+            Class<?> c = XposedHelpers.findClass(
+                    "com.android.systemui.statusbar.phone.PhoneStatusBarView", cl);
+            XposedBridge.hookAllMethods(c, "onAttachedToWindow", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) {
+                    if (param.thisObject instanceof View) ((View) param.thisObject).setVisibility(View.GONE);
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log(TAG + "release space hook failed: " + t);
+        }
     }
 
     /**
